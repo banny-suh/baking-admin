@@ -26,11 +26,6 @@ export default function Recipes({ ingredients }) {
   const [currentItems, setCurrentItems] = useState([])
   const [searchIngredient, setSearchIngredient] = useState('')
   const [isSelectOpen, setIsSelectOpen] = useState(false)
-  const [errors, setErrors] = useState({
-    name: false,
-    ingredients: false,
-    count: false
-  });
 
   useEffect(() => {
     const r = localStorage.getItem(REC_KEY)
@@ -50,17 +45,23 @@ export default function Recipes({ ingredients }) {
   }
 
   const validateForm = () => {
-    const newErrors = {
-      name: !name.trim(),
-      ingredients: currentItems.length === 0,
-      count: !count || count < 1
-    };
-    setErrors(newErrors);
-    return !Object.values(newErrors).some(error => error);
+    const validationErrors = [];
+    if (!name.trim()) {
+      validationErrors.push('레시피 이름을 입력해주세요.');
+    }
+    if (!count || count < 1) {
+      validationErrors.push('완성 개수는 1개 이상의 값을 입력해주세요.');
+    }
+    if (currentItems.length === 0) {
+      validationErrors.push('최소 1개 이상의 재료를 추가해주세요.');
+    }
+    return validationErrors;
   };
 
   const saveRecipe = () => {
-    if (!validateForm()) {
+    const errors = validateForm();
+    if (errors.length > 0) {
+      alert(errors.join('\n'));
       return;
     }
     const r = { 
@@ -73,7 +74,7 @@ export default function Recipes({ ingredients }) {
     setName(''); 
     setCount(1); 
     setCurrentItems([]);
-    setErrors({ name: false, ingredients: false, count: false });
+    // No need to reset 'errors' state here as it's removed
   };
 
   const removeRecipe = (id) => setRecipes(s => s.filter(r => r.id !== id))
@@ -118,25 +119,21 @@ export default function Recipes({ ingredients }) {
         <div className="form-group">
           <label>레시피 이름</label>
           <input 
-            className={errors.name ? 'invalid' : ''}
-            placeholder="예: 통밀식빵" 
+            placeholder="예: 통밀식빵"
             value={name} 
             onChange={e => setName(e.target.value)} 
           />
-{/*           {errors.name && <span className="error-message">레시피 이름을 입력해주세요</span>} */}
         </div>
 
         <div className="form-group">
           <label>완성 개수</label>
           <input 
-            className={errors.count ? 'invalid' : ''}
             type="number"
             min="1"
             placeholder="몇 개가 나오나요?" 
             value={count} 
             onChange={e => setCount(e.target.value)} 
           />
-          {errors.count && <span className="error-message">1개 이상의 값을 입력해주세요</span>}
         </div>
 
         <div className="ingredients-selector">
@@ -179,7 +176,6 @@ export default function Recipes({ ingredients }) {
           </div>
           <button className="btn primary" onClick={addIngToRecipe}>재료 추가</button>
         </div>
-        {errors.ingredients && <span className="error-message">최소 1개 이상의 재료를 추가해주세요</span>}
 
         <ul className="list small">
           {currentItems.map((it, idx) => {
