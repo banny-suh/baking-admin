@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { recipesData } from '../../../data/recipesData.js' 
 
 const REC_KEY = 'upc_recipes_v1'
+const SELLING_PERCENT = 0.35 // 35% of selling price, 65% margin
 
 function calcUnitCost(recipe, ingredients) {
   const map = Object.fromEntries(ingredients.map(i => [i.id, i]))
@@ -12,12 +13,19 @@ function calcUnitCost(recipe, ingredients) {
     total += (ing.price / ing.gramsPurchased) * it.gramsUsed
   }
   const perItem = recipe.count && recipe.count > 0 ? total / recipe.count : total
-  return { total: Number(total.toFixed(2)), perItem: Number(perItem.toFixed(2)) }
+  
+  const marketPricePerItem = Math.ceil(perItem / SELLING_PERCENT);
+
+  return { 
+    total: Number(total.toFixed(2)), 
+    perItem: Number(perItem.toFixed(2)),
+    marketPricePerItem: Number(marketPricePerItem.toFixed(2)) 
+  }
 }
 
 export default function Recipes({ ingredients }) {
   const [recipes, setRecipes] = useState([])
-  const [openIngredients, setOpenIngredients] = useState({}); // State to manage toggle for each recipe
+  const [openIngredients, setOpenIngredients] = useState({}); 
 
   const [name, setName] = useState('')
   const [count, setCount] = useState(1)
@@ -27,6 +35,7 @@ export default function Recipes({ ingredients }) {
   const [searchIngredient, setSearchIngredient] = useState('')
   const [isSelectOpen, setIsSelectOpen] = useState(false)
   const [addIngredientErrors, setAddIngredientErrors] = useState({ selectedIng: false, gramsUsed: false });
+  const [editingRecipeId, setEditingRecipeId] = useState(null); // New state for editing
 
   useEffect(() => {
     const r = localStorage.getItem(REC_KEY)
@@ -77,22 +86,50 @@ export default function Recipes({ ingredients }) {
     return validationErrors;
   };
 
+  const resetForm = () => {
+    setName(''); 
+    setCount(1); 
+    setCurrentItems([]);
+    setEditingRecipeId(null);
+    setAddIngredientErrors({ selectedIng: false, gramsUsed: false });
+  }
+
   const saveRecipe = () => {
     const errors = validateForm();
     if (errors.length > 0) {
       alert(errors.join('\n'));
       return;
     }
-    const r = { 
-      id: Date.now().toString(), 
-      name: name.trim(), 
-      count: Number(count), 
-      items: currentItems 
-    };
-    setRecipes(s => [r, ...s]);
-    setName(''); 
-    setCount(1); 
-    setCurrentItems([]);
+
+    if (editingRecipeId) {
+      // Update existing recipe
+      setRecipes(s => s.map(r => 
+        r.id === editingRecipeId 
+          ? { ...r, name: name.trim(), count: Number(count), items: currentItems } 
+          : r
+      ));
+    } else {
+      // Add new recipe
+      const r = { 
+        id: Date.now().toString(), 
+        name: name.trim(), 
+        count: Number(count), 
+        items: currentItems 
+      };
+      setRecipes(s => [r, ...s]);
+    }
+    resetForm();
+  };
+
+  const startEditRecipe = (id) => {
+    const recipeToEdit = recipes.find(r => r.id === id);
+    if (recipeToEdit) {
+      setEditingRecipeId(id);
+      setName(recipeToEdit.name);
+      setCount(recipeToEdit.count);
+      setCurrentItems(recipeToEdit.items);
+      // Optionally scroll to top or form
+    }
   };
 
   const removeRecipe = (id) => setRecipes(s => s.filter(r => r.id !== id))
@@ -105,7 +142,7 @@ export default function Recipes({ ingredients }) {
     setSelectedIng(id)
     setSearchIngredient(ingredients.find(ing => ing.id === id)?.name || '')
     setIsSelectOpen(false)
-    setAddIngredientErrors(prev => ({ ...prev, selectedIng: false })); // Clear error on selection
+    setAddIngredientErrors(prev => ({ ...prev, selectedIng: false })); 
   }
 
   const selectRef = useRef(null)
@@ -166,10 +203,10 @@ export default function Recipes({ ingredients }) {
                 onChange={e => {
                   setSearchIngredient(e.target.value)
                   setIsSelectOpen(true)
-                  setAddIngredientErrors(prev => ({ ...prev, selectedIng: false })); // Clear error on typing
+                  setAddIngredientErrors(prev => ({ ...prev, selectedIng: false })); 
                 }}
                 onClick={() => setIsSelectOpen(true)}
-                className={addIngredientErrors.selectedIng ? 'invalid' : ''} // Apply invalid class
+                className={addIngredientErrors.selectedIng ? 'invalid' : ''} 
               />
               {isSelectOpen && filteredIngredients.length > 0 && (
                 <ul className="select-dropdown">
@@ -193,10 +230,10 @@ export default function Recipes({ ingredients }) {
               value={gramsUsed}
               onChange={e => {
                 setGramsUsed(e.target.value)
-                setAddIngredientErrors(prev => ({ ...prev, gramsUsed: false })); // Clear error on typing
+                setAddIngredientErrors(prev => ({ ...prev, gramsUsed: false })); 
               }}
               min="0"
-              className={addIngredientErrors.gramsUsed ? 'invalid' : ''} // Apply invalid class
+              className={addIngredientErrors.gramsUsed ? 'invalid' : ''} 
             />
           </div>
           <button className="btn primary" onClick={addIngToRecipe}>재료 추가</button>
@@ -211,7 +248,12 @@ export default function Recipes({ ingredients }) {
         </ul>
 
         <div className="row">
-          <button className="btn primary" onClick={saveRecipe}>레시피 저장</button>
+          <button className="btn primary" onClick={saveRecipe}>
+            {editingRecipeId ? '레시피 업데이트' : '레시피 저장'}
+          </button>
+          {editingRecipeId && (
+            <button className="btn ghost" onClick={resetForm}>취소</button>
+          )}
         </div>
 
         <h4>저장된 레시피</h4>
@@ -223,7 +265,12 @@ export default function Recipes({ ingredients }) {
               <li key={r.id} className="list-item recipe-item">
                 <div>
                   <strong>{r.name}</strong>
-                  <div className="muted">총비용: {c.total} 원 · 개당: {c.perItem} 원 · ({r.count}개)</div>
+                  <div className="muted">
+                    총비용: {c.total} 원 · 개당: {c.perItem} 원 · ({r.count}개)
+                  </div>
+                  <div className="muted">
+                    개당 시중가: {c.marketPricePerItem} 원
+                  </div>
                   <div className="recipe-ingredients">
                     <h5 onClick={() => toggleIngredientsVisibility(r.id)} style={{ cursor: 'pointer' }}>
                       사용 재료 
@@ -257,6 +304,12 @@ export default function Recipes({ ingredients }) {
                   </div>
                 </div>
                 <div className="actions">
+                  <button className="btn ghost" onClick={() => startEditRecipe(r.id)}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
                   <button className="btn ghost" onClick={() => removeRecipe(r.id)}>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
