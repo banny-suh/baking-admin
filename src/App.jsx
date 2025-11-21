@@ -3,8 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Menu from './components/common/Menu';
 import UnitPriceCalculator from './pages/UnitPriceCalculator';
-
-const Home = () => <h1>Home</h1>;
+import Home from './pages/Home';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
