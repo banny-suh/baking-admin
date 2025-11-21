@@ -84,22 +84,12 @@ export default function Ingredients({ onUpdate }) {
         <div className="side-panel">
             <div className="panel-header">
                 <h3>재료 관리</h3>
-                <button 
-                    className="btn secondary" 
+                <button
+                    className="btn secondary"
                     onClick={() => setIsFormVisible(!isFormVisible)}
                 >
                     {isFormVisible ? '닫기' : '재료 추가하기'}
                 </button>
-            </div>
-
-            <div className="search-box">
-                <input 
-                    type="text"
-                    placeholder="재료 검색..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
-                />
             </div>
 
             {isFormVisible && (
@@ -147,6 +137,17 @@ export default function Ingredients({ onUpdate }) {
                     </div>
                 </form>
             )}
+
+
+            <div className="search-box">
+                <input
+                    type="text"
+                    placeholder="재료 검색..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                />
+            </div>
 
             <div className="ingredients-list">
                 {filteredItems.slice(0, visibleItems).map(item => (
