@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Ingredients from './unit-price-calculator/components/Ingredients.jsx';
-import Recipes from './unit-price-calculator/components/Recipes.jsx';
+import Ingredients from './components/Ingredients.jsx';
+import Recipes from './components/Recipes.jsx';
 import './UnitPriceCalculator.css';
 
 function UnitPriceCalculator() {

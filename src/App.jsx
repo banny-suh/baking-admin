@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
-import UnitPriceCalculator from './pages/UnitPriceCalculator';
+import UnitPriceCalculator from './pages/unit-price-calculator/UnitPriceCalculator';
 import Home from './pages/Home';
 import './App.css';
 

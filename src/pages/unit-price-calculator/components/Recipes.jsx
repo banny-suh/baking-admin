@@ -26,6 +26,7 @@ export default function Recipes({ ingredients }) {
   const [currentItems, setCurrentItems] = useState([])
   const [searchIngredient, setSearchIngredient] = useState('')
   const [isSelectOpen, setIsSelectOpen] = useState(false)
+  const [addIngredientErrors, setAddIngredientErrors] = useState({ selectedIng: false, gramsUsed: false });
 
   useEffect(() => {
     const r = localStorage.getItem(REC_KEY)
@@ -37,11 +38,29 @@ export default function Recipes({ ingredients }) {
   useEffect(() => localStorage.setItem(REC_KEY, JSON.stringify(recipes)), [recipes])
 
   const addIngToRecipe = () => {
-    if (!selectedIng || !gramsUsed) return
-    setCurrentItems(s => [...s, { ingredientId: selectedIng, gramsUsed: Number(gramsUsed) }])
+    let hasError = false;
+    const newAddErrors = { selectedIng: false, gramsUsed: false };
+
+    if (!selectedIng) {
+      newAddErrors.selectedIng = true;
+      hasError = true;
+    }
+    if (!gramsUsed || Number(gramsUsed) <= 0) {
+      newAddErrors.gramsUsed = true;
+      hasError = true;
+    }
+
+    setAddIngredientErrors(newAddErrors);
+
+    if (hasError) {
+      return;
+    }
+
+    setCurrentItems(s => [...s, { ingredientId: selectedIng, gramsUsed: Number(gramsUsed) }]);
     setSelectedIng(''); 
     setGramsUsed('');
     setSearchIngredient('');
+    setAddIngredientErrors({ selectedIng: false, gramsUsed: false });
   }
 
   const validateForm = () => {
@@ -74,7 +93,6 @@ export default function Recipes({ ingredients }) {
     setName(''); 
     setCount(1); 
     setCurrentItems([]);
-    // No need to reset 'errors' state here as it's removed
   };
 
   const removeRecipe = (id) => setRecipes(s => s.filter(r => r.id !== id))
@@ -87,6 +105,7 @@ export default function Recipes({ ingredients }) {
     setSelectedIng(id)
     setSearchIngredient(ingredients.find(ing => ing.id === id)?.name || '')
     setIsSelectOpen(false)
+    setAddIngredientErrors(prev => ({ ...prev, selectedIng: false })); // Clear error on selection
   }
 
   const selectRef = useRef(null)
@@ -119,7 +138,7 @@ export default function Recipes({ ingredients }) {
         <div className="form-group">
           <label>레시피 이름</label>
           <input 
-            placeholder="예: 통밀식빵"
+            placeholder="예: 통밀식빵" 
             value={name} 
             onChange={e => setName(e.target.value)} 
           />
@@ -147,8 +166,10 @@ export default function Recipes({ ingredients }) {
                 onChange={e => {
                   setSearchIngredient(e.target.value)
                   setIsSelectOpen(true)
+                  setAddIngredientErrors(prev => ({ ...prev, selectedIng: false })); // Clear error on typing
                 }}
                 onClick={() => setIsSelectOpen(true)}
+                className={addIngredientErrors.selectedIng ? 'invalid' : ''} // Apply invalid class
               />
               {isSelectOpen && filteredIngredients.length > 0 && (
                 <ul className="select-dropdown">
@@ -170,8 +191,12 @@ export default function Recipes({ ingredients }) {
               type="number"
               placeholder="사용할 그램 수"
               value={gramsUsed}
-              onChange={e => setGramsUsed(e.target.value)}
+              onChange={e => {
+                setGramsUsed(e.target.value)
+                setAddIngredientErrors(prev => ({ ...prev, gramsUsed: false })); // Clear error on typing
+              }}
               min="0"
+              className={addIngredientErrors.gramsUsed ? 'invalid' : ''} // Apply invalid class
             />
           </div>
           <button className="btn primary" onClick={addIngToRecipe}>재료 추가</button>
