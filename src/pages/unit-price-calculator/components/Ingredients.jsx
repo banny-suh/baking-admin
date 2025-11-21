@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { ingredientsData } from '../../../data/ingredientsData.js'
+import Modal from '../../../components/common/Modal.jsx' // Import the Modal component
 
 const STORAGE_KEY = 'upc_ingredients_v1'
-const ITEMS_PER_PAGE = 5
+const ITEMS_PER_PAGE = 7
 
 export default function Ingredients({ onUpdate }) {
     const [items, setItems] = useState([])
@@ -11,7 +12,7 @@ export default function Ingredients({ onUpdate }) {
     const [price, setPrice] = useState('')
     const [visibleItems, setVisibleItems] = useState(ITEMS_PER_PAGE)
     const [searchTerm, setSearchTerm] = useState('')
-    const [isFormVisible, setIsFormVisible] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false) // Changed to isModalOpen
     const [errors, setErrors] = useState({
         name: false,
         gramsPurchased: false,
@@ -27,13 +28,6 @@ export default function Ingredients({ onUpdate }) {
         if (onUpdate) onUpdate(items)
     }, [items])
 
-    const add = () => {
-        if (!name.trim() || !gramsPurchased || !price) return
-        const id = Date.now().toString()
-        setItems(s => [{ id, name: name.trim(), gramsPurchased: Number(gramsPurchased), price: Number(price) }, ...s])
-        setName(''); setGramsPurchased(''); setPrice('')
-    }
-
     const removeOne = (id) => setItems(s => s.filter(i => i.id !== id))
 
     const showMore = () => {
@@ -44,6 +38,7 @@ export default function Ingredients({ onUpdate }) {
         setName('');
         setGramsPurchased('');
         setPrice('');
+        setErrors({ name: false, gramsPurchased: false, price: false }); // Also reset errors
     }
 
     const validateForm = () => {
@@ -70,10 +65,8 @@ export default function Ingredients({ onUpdate }) {
           price: Number(price)
         }, ...s]);
         
-        setName('');
-        setGramsPurchased('');
-        setPrice('');
-        setErrors({ name: false, gramsPurchased: false, price: false });
+        resetForm(); // Reset form fields and errors
+        setIsModalOpen(false); // Close the modal after submission
     };
 
     const filteredItems = items.filter(item => 
@@ -84,15 +77,25 @@ export default function Ingredients({ onUpdate }) {
         <div className="side-panel">
             <div className="panel-header">
                 <h3>재료 관리</h3>
-                <button
-                    className="btn secondary"
-                    onClick={() => setIsFormVisible(!isFormVisible)}
+                <button 
+                    className="btn secondary" 
+                    onClick={() => setIsModalOpen(true)} // Open modal
                 >
-                    {isFormVisible ? '닫기' : '재료 추가하기'}
+                    재료 추가하기
                 </button>
             </div>
 
-            {isFormVisible && (
+            <div className="search-box">
+                <input 
+                    type="text"
+                    placeholder="재료 검색..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                />
+            </div>
+
+            <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); resetForm(); }} title="새 재료 추가">
                 <form className="ingredients-form" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>재료 이름</label>
@@ -102,7 +105,6 @@ export default function Ingredients({ onUpdate }) {
                             value={name}
                             onChange={e => setName(e.target.value)}
                         />
-                        {errors.name && <span className="error-message">재료 이름을 입력해주세요</span>}
                     </div>
 
                     <div className="form-group">
@@ -115,7 +117,6 @@ export default function Ingredients({ onUpdate }) {
                             onChange={e => setGramsPurchased(e.target.value)}
                             min="0"
                         />
-                        {errors.gramsPurchased && <span className="error-message">유효한 용량을 입력해주세요</span>}
                     </div>
 
                     <div className="form-group">
@@ -128,7 +129,6 @@ export default function Ingredients({ onUpdate }) {
                             onChange={e => setPrice(e.target.value)}
                             min="0"
                         />
-                        {errors.price && <span className="error-message">유효한 가격을 입력해주세요</span>}
                     </div>
 
                     <div className="form-actions">
@@ -136,18 +136,7 @@ export default function Ingredients({ onUpdate }) {
                         <button type="button" className="btn-reset" onClick={resetForm}>초기화</button>
                     </div>
                 </form>
-            )}
-
-
-            <div className="search-box">
-                <input
-                    type="text"
-                    placeholder="재료 검색..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="search-input"
-                />
-            </div>
+            </Modal>
 
             <div className="ingredients-list">
                 {filteredItems.slice(0, visibleItems).map(item => (
