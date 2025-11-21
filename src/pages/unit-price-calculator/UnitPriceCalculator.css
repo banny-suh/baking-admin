@@ -222,6 +222,7 @@
   border-radius: 8px;
   margin-bottom: 0.5rem;
   background: #fff;
+  height: 9vh;
 }
 
 .ingredient-item .content {
