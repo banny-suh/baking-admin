@@ -4,6 +4,11 @@
   gap: 2rem;
 }
 
+.side-panel, .main-panel {
+  min-width: 585px;
+  overflow-x: auto;
+}
+
 .container {
   width: 100%;
   max-width: var(--container-width);
