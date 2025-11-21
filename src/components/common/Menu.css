@@ -1,0 +1,31 @@
+.menu {
+  width: 250px;
+  background-color: var(--card);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+
+.menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu li a {
+  display: block;
+  padding: 10px 15px;
+  color: var(--muted);
+  text-decoration: none;
+  border-radius: var(--radius);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.menu li a:hover {
+  background-color: var(--bg);
+  color: var(--primary);
+}
+
+.menu li a.active {
+  background-color: var(--primary);
+  color: white;
+}

@@ -63,8 +63,16 @@ body {
 
 .grid {
   display: grid;
-  width: 80%;
-  grid-template-columns: 600px 1fr;  /* Increased from 500px to 600px */
+  width: 100%;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+  min-height: 100vh;
+}
+
+.unit-price-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr;
   gap: 2rem;
   margin-bottom: 2rem;
 }
@@ -80,11 +88,6 @@ body {
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  /* padding: 1.5rem; */
-  /* background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  height: fit-content; */
 }
 
 .recipe-form {
@@ -485,7 +488,7 @@ h3, h4 {
 
 .custom-select input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0..75rem 1rem;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: #fff;
@@ -578,6 +581,7 @@ h3, h4 {
 
   .list-item {
     flex-direction: column;
+.
     align-items: flex-start;
   }
   

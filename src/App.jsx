@@ -1,38 +1,24 @@
-import { useState } from 'react'
-import './App.css'
-import Ingredients from './components/Ingredients.jsx'
-import Recipes from './components/Recipes.jsx'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import './App.css';
+import Menu from './components/common/Menu';
+import UnitPriceCalculator from './pages/UnitPriceCalculator';
+
+const Home = () => <h1>Home</h1>;
 
 function App() {
-  const [ingredients, setIngredients] = useState([])
-
-  const handleIngredientsUpdate = (updatedIngredients) => {
-    setIngredients(updatedIngredients)
-  }
-
   return (
-    <>
-      <header className="topbar">
-        <h1 className="title">빵 단가 계산기</h1>
-        <p className="subtitle">재료 등록 → 레시피 등록 → 개당 단가 계산</p>
-      </header>
-
-      <main className="container">
-        <section className="grid">
-          <Ingredients onUpdate={handleIngredientsUpdate} />
-          <Recipes ingredients={ingredients} />
-        </section>
-
-        {/* <section className="card info">
-          <h3>유용한 팁</h3>
-          <ul>
-            <li>재료는 g 단위로 입력하세요.</li>
-            <li>가격은 해당 구매량 전체의 가격(원)으로 입력하세요.</li>
-          </ul>
-        </section> */}
-      </main>
-    </>
-  )
+    <Router>
+      <div className="grid">
+        <Menu />
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/unit-price-calculator" element={<UnitPriceCalculator />} />
+          </Routes>
+        </main>
+      </div>
+    </Router>
+  );
 }
 
-export default App
+export default App;
