@@ -13,19 +13,19 @@ function calcUnitCost(recipe, ingredients) {
     total += (ing.price / ing.gramsPurchased) * it.gramsUsed
   }
   const perItem = recipe.count && recipe.count > 0 ? total / recipe.count : total
-  
+
   const marketPricePerItem = Math.ceil(perItem / SELLING_PERCENT);
 
-  return { 
-    total: Number(total.toFixed(2)), 
+  return {
+    total: Number(total.toFixed(2)),
     perItem: Number(perItem.toFixed(2)),
-    marketPricePerItem: Number(marketPricePerItem.toFixed(2)) 
+    marketPricePerItem: Number(marketPricePerItem.toFixed(2))
   }
 }
 
 export default function Recipes({ ingredients }) {
   const [recipes, setRecipes] = useState([])
-  const [openIngredients, setOpenIngredients] = useState({}); 
+  const [openIngredients, setOpenIngredients] = useState({});
 
   const [name, setName] = useState('')
   const [count, setCount] = useState(1)
@@ -66,7 +66,7 @@ export default function Recipes({ ingredients }) {
     }
 
     setCurrentItems(s => [...s, { ingredientId: selectedIng, gramsUsed: Number(gramsUsed) }]);
-    setSelectedIng(''); 
+    setSelectedIng('');
     setGramsUsed('');
     setSearchIngredient('');
     setAddIngredientErrors({ selectedIng: false, gramsUsed: false });
@@ -87,8 +87,8 @@ export default function Recipes({ ingredients }) {
   };
 
   const resetForm = () => {
-    setName(''); 
-    setCount(1); 
+    setName('');
+    setCount(1);
     setCurrentItems([]);
     setEditingRecipeId(null);
     setAddIngredientErrors({ selectedIng: false, gramsUsed: false });
@@ -103,18 +103,18 @@ export default function Recipes({ ingredients }) {
 
     if (editingRecipeId) {
       // Update existing recipe
-      setRecipes(s => s.map(r => 
-        r.id === editingRecipeId 
-          ? { ...r, name: name.trim(), count: Number(count), items: currentItems } 
+      setRecipes(s => s.map(r =>
+        r.id === editingRecipeId
+          ? { ...r, name: name.trim(), count: Number(count), items: currentItems }
           : r
       ));
     } else {
       // Add new recipe
-      const r = { 
-        id: Date.now().toString(), 
-        name: name.trim(), 
-        count: Number(count), 
-        items: currentItems 
+      const r = {
+        id: Date.now().toString(),
+        name: name.trim(),
+        count: Number(count),
+        items: currentItems
       };
       setRecipes(s => [r, ...s]);
     }
@@ -134,7 +134,7 @@ export default function Recipes({ ingredients }) {
 
   const removeRecipe = (id) => setRecipes(s => s.filter(r => r.id !== id))
 
-  const filteredIngredients = ingredients.filter(ing => 
+  const filteredIngredients = ingredients.filter(ing =>
     ing.name.toLowerCase().includes(searchIngredient.toLowerCase())
   )
 
@@ -142,7 +142,7 @@ export default function Recipes({ ingredients }) {
     setSelectedIng(id)
     setSearchIngredient(ingredients.find(ing => ing.id === id)?.name || '')
     setIsSelectOpen(false)
-    setAddIngredientErrors(prev => ({ ...prev, selectedIng: false })); 
+    setAddIngredientErrors(prev => ({ ...prev, selectedIng: false }));
   }
 
   const selectRef = useRef(null)
@@ -168,27 +168,33 @@ export default function Recipes({ ingredients }) {
   return (
     <div className="main-panel">
       <div className="panel-header">
-        <h3>레시피 등록</h3>
+        <h3>레시피 관리</h3>
+        <button
+            className="btn secondary"
+            onClick={() => setIsModalOpen(true)} // Open modal
+        >
+            레시피 추가하기
+        </button>
       </div>
 
       <div className="recipe-form">
         <div className="form-group">
           <label>레시피 이름</label>
-          <input 
-            placeholder="예: 통밀식빵" 
-            value={name} 
-            onChange={e => setName(e.target.value)} 
+          <input
+            placeholder="예: 통밀식빵"
+            value={name}
+            onChange={e => setName(e.target.value)}
           />
         </div>
 
         <div className="form-group">
           <label>완성 개수</label>
-          <input 
+          <input
             type="number"
             min="1"
-            placeholder="몇 개가 나오나요?" 
-            value={count} 
-            onChange={e => setCount(e.target.value)} 
+            placeholder="몇 개가 나오나요?"
+            value={count}
+            onChange={e => setCount(e.target.value)}
           />
         </div>
 
@@ -203,16 +209,16 @@ export default function Recipes({ ingredients }) {
                 onChange={e => {
                   setSearchIngredient(e.target.value)
                   setIsSelectOpen(true)
-                  setAddIngredientErrors(prev => ({ ...prev, selectedIng: false })); 
+                  setAddIngredientErrors(prev => ({ ...prev, selectedIng: false }));
                 }}
                 onClick={() => setIsSelectOpen(true)}
-                className={addIngredientErrors.selectedIng ? 'invalid' : ''} 
+                className={addIngredientErrors.selectedIng ? 'invalid' : ''}
               />
               {isSelectOpen && filteredIngredients.length > 0 && (
                 <ul className="select-dropdown">
                   {filteredIngredients.map(ing => (
-                    <li 
-                      key={ing.id} 
+                    <li
+                      key={ing.id}
                       onClick={() => handleIngredientSelect(ing.id)}
                     >
                       {ing.name} ({ing.gramsPurchased}g · {ing.price}원)
@@ -230,10 +236,10 @@ export default function Recipes({ ingredients }) {
               value={gramsUsed}
               onChange={e => {
                 setGramsUsed(e.target.value)
-                setAddIngredientErrors(prev => ({ ...prev, gramsUsed: false })); 
+                setAddIngredientErrors(prev => ({ ...prev, gramsUsed: false }));
               }}
               min="0"
-              className={addIngredientErrors.gramsUsed ? 'invalid' : ''} 
+              className={addIngredientErrors.gramsUsed ? 'invalid' : ''}
             />
           </div>
           <button className="btn primary" onClick={addIngToRecipe}>재료 추가</button>
@@ -273,16 +279,16 @@ export default function Recipes({ ingredients }) {
                   </div>
                   <div className="recipe-ingredients">
                     <h5 onClick={() => toggleIngredientsVisibility(r.id)} style={{ cursor: 'pointer' }}>
-                      사용 재료 
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        width="16" 
-                        height="16" 
-                        viewBox="0 0 24 24" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        strokeWidth="2" 
-                        strokeLinecap="round" 
+                      사용 재료
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
                         strokeLinejoin="round"
                         style={{ marginLeft: '5px', verticalAlign: 'middle', transform: isIngredientsVisible ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
                       >

@@ -4,6 +4,18 @@
   gap: 2rem;
 }
 
+.scheduler-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Adjust as needed for scheduler layout */
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .unit-price-grid, .scheduler-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .side-panel, .main-panel {
   min-width: 585px; /* Maintain a minimum width */
   overflow-x: hidden; /* Hide horizontal overflow within the panel */
@@ -555,4 +567,71 @@ h3, h4 {
   background: #f1f5f9;
   border-radius: 4px;
   color: #1e293b;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--card);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #1e293b;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.close-button:hover {
+  color: #0f172a;
+}
+
+.modal-body {
+  flex-grow: 1;
+  padding-bottom: 1rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  margin-top: 1rem;
 }
