@@ -1,7 +1,7 @@
 export const recipesData = [
     {
         id: '1',
-        name: '사워도우',
+        name: '천연발효종 사워도우',
         count: 2,
         items: [
             /**
@@ -11,9 +11,31 @@ export const recipesData = [
              * 통밀 100g
              */
             { ingredientId: 'levain001', gramsUsed: 200 },
-            { ingredientId: 'flour003', gramsUsed: 600 },
             { ingredientId: 'flour001', gramsUsed: 300 },
+            { ingredientId: 'flour003', gramsUsed: 600 },
             { ingredientId: 'flour004', gramsUsed: 100 },
+            { ingredientId: 'salt001', gramsUsed: 20 },
+        ]
+    },
+    {
+        id: '4',
+        name: '천연발효종 포카치아',
+        count: 1,
+        items: [
+            /**
+             * 강력분 150g
+             * 우리밀 강력분 150g
+             * 통밀 30g
+             * 소금 6g
+             * 올리브유 30g
+             * 르방 100g
+             */
+            { ingredientId: 'levain001', gramsUsed: 100 },
+            { ingredientId: 'flour001', gramsUsed: 150 },
+            { ingredientId: 'flour003', gramsUsed: 150 },
+            { ingredientId: 'flour004', gramsUsed: 30 },
+            { ingredientId: 'salt001', gramsUsed: 6 },
+            { ingredientId: 'fats001', gramsUsed: 30 },
         ]
     },
     {

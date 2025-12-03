@@ -7,7 +7,7 @@ export const ingredientsData = [
     { "id": "fats001", "name": "엑스트라버진 올리브유", "gramsPurchased": 1000, "price": 25990 },
     { "id": "dairy001", "name": "앵커 버터 (냉동)", "gramsPurchased": 454, "price": 8000 },
     { "id": "dairy002", "name": "우유", "gramsPurchased": 1000, "price": 2920 },
-    { "id": "sweet001", "name": "소금", "gramsPurchased": 1000, "price": 3000 },
+    { "id": "salt001", "name": "소금", "gramsPurchased": 1000, "price": 3000 },
     { "id": "sweet002", "name": "백설탕", "gramsPurchased": 1000, "price": 2800 },
     { "id": "secondary001", "name": "계란", "gramsPurchased": 20, "price": 7000 },
 ]
